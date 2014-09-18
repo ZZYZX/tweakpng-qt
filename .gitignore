@@ -1,5 +1,7 @@
-# C++ objects and libs
+# Temporary files
+*~
 
+# C++ objects and libs
 *.slo
 *.lo
 *.o
@@ -11,7 +13,6 @@
 *.dylib
 
 # Qt-es
-
 /.qmake.cache
 /.qmake.stash
 *.pro.user
@@ -24,5 +25,7 @@ Makefile*
 *-build-*
 
 # QtCreator
-
 *.autosave
+
+# Binaries
+tweakpng
