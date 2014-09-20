@@ -3,7 +3,7 @@ TweakPNG-qt
 
 The cross-platform port of TweakPNG tool.
 
-For usage instructions, see [a relative link](docs/tweakpng.txt).
+For usage instructions, see [tweakpng.txt](docs/tweakpng.txt).
 
 
 LICENSE
@@ -12,7 +12,7 @@ Released under GPLv3 license.
 
 Original code by Jason Summers [Web site](http://entropymine.com/jason/tweakpng/)
 
-Please refer to [a relative link](docs/COPYING.txt).
+Please refer to [COPYING.txt](docs/COPYING.txt).
 
 TODO
 ----
@@ -23,8 +23,8 @@ TODO
 - Test on both Mac and Windows platforms
 - Dynamic window icon
 - Undo/Redo
-- Tabbed interface
 - Drag & Drop support of files and chunks (between the tabs?)
-- Localization via Qt's .ts l18n framework
+- Tabbed interface
+- Localization via Qt's .ts i16n framework
 - support for stdin pipe (and maybe stdout > ?)
 - "What you're about to save is not going to be an image file" confirmation window upon save.
