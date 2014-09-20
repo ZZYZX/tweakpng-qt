@@ -6,11 +6,11 @@
 #include <QList>
 #include <QStringList>
 
-class TableItem
+class ChunkTableItem
 {
 
 public:
-    TableItem();
+    ChunkTableItem();
     QString name; // Chunk name: IHDR, IEND, etc...
     QString len;  // Total bytelength
     QString crc;  // CRC
@@ -18,15 +18,15 @@ public:
     QString data; // Contents
 };
  
-class TableModel : public QAbstractTableModel
+class ChunkTableModel : public QAbstractTableModel
 {
     Q_OBJECT
 
 public:
-    explicit TableModel(QObject *parent = 0);
+    explicit ChunkTableModel(QObject *parent = 0);
  
     QStringList header_data;
-    QList<TableItem *> list;
+    QList<ChunkTableItem *> list;
  
     QVariant data(const QModelIndex &index, int role) const;
     bool setData(const QModelIndex &index, const QVariant &value, int role);

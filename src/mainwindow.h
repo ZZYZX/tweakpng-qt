@@ -21,7 +21,7 @@ public:
     MainWindow();
 
     QTableView* table_view;
-    TableModel* table_model;
+    ChunkTableModel* table_model;
 
     QString isItABirdIsItAPlane(QByteArray &blob);
 
@@ -68,14 +68,28 @@ private:
     QMenu *fileMenu;
         QAction *newAct;
         QAction *openAct;
+        QAction *reOpenAct;
         QAction *saveAct;
+        QAction *saveAsAct;
+        QAction *closeAct;
+        // ----------------
+        QAction *checkValidAct;
+        QAction *fileSigAct;
+        // ----------------
         QAction *exitAct;
     QMenu *editMenu;
-        QAction *undoAct;
-        QAction *redoAct;
+        QAction *editAct;
+        QAction *deleteAct;
+        QAction *moveUpAct;
+        QAction *moveDownAct;
+        // ----------------
         QAction *cutAct;
         QAction *copyAct;
         QAction *pasteAct;
+        // ----------------
+        // IDAT actions...
+        // ----------------
+        // Import/Export
     QMenu *insertMenu;
     QMenu *optionsMenu;
     QMenu *toolsMenu;

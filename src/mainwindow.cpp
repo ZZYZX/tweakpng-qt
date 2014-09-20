@@ -12,15 +12,15 @@ MainWindow::MainWindow()
     updateWindowTitle();
 
     // Set window properties
-    setMinimumSize(500, 180);
-    resize(750, 320);
+    setMinimumSize(500, 240);
+    resize(768, 360);
 
     QWidget *widget = new QWidget;
     setCentralWidget(widget);
 
     // The main widget
     table_view = new QTableView;
-    table_model = new TableModel;
+    table_model = new ChunkTableModel;
     // table_view->setItemDelegate(new TableDelegate);
     table_view->setModel(table_model);
 
@@ -41,10 +41,10 @@ MainWindow::MainWindow()
 void MainWindow::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu menu(this);
-    // MENUITEM "&Edit Chunk...\tEnter",       ID_EDITCHUNK
-    // MENUITEM "&Delete\tDel",                ID_DELCHUNK
-    // MENUITEM "Move &Up\tAlt+Up",            ID_MOVEUP
-    // MENUITEM "Mo&ve Down\tAlt+Down",        ID_MOVEDOWN
+    menu.addAction(editAct);
+    menu.addAction(deleteAct);
+    menu.addAction(moveUpAct);
+    menu.addAction(moveDownAct);
     menu.addSeparator();
     menu.addAction(cutAct);
     menu.addAction(copyAct);
@@ -205,21 +205,51 @@ void MainWindow::createActions()
     openAct->setShortcuts(QKeySequence::Open);
     connect(openAct, SIGNAL(triggered()), this, SLOT(open()));
 
+    reOpenAct = new QAction(tr("&Repen"), this);
+    connect(reOpenAct, SIGNAL(triggered()), this, SLOT(open()));
+
     saveAct = new QAction(tr("&Save"), this);
     saveAct->setShortcuts(QKeySequence::Save);
     connect(saveAct, SIGNAL(triggered()), this, SLOT(save()));
+
+    saveAsAct = new QAction(tr("&Save As..."), this);
+    saveAsAct->setShortcuts(QKeySequence::SaveAs);
+    connect(saveAsAct, SIGNAL(triggered()), this, SLOT(save()));
+
+    closeAct = new QAction(tr("&Close"), this);
+    closeAct->setShortcuts(QKeySequence::Close);
+    connect(closeAct, SIGNAL(triggered()), this, SLOT(close()));
+
+    checkValidAct = new QAction(tr("&Check Validity"), this);
+    connect(checkValidAct, SIGNAL(triggered()), this, SLOT(open()));
+
+    fileSigAct = new QAction(tr("&File signature..."), this);
+    connect(fileSigAct, SIGNAL(triggered()), this, SLOT(close()));
 
     exitAct = new QAction(tr("E&xit"), this);
     exitAct->setShortcuts(QKeySequence::Quit);
     connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
 
-    undoAct = new QAction(tr("&Undo"), this);
-    undoAct->setShortcuts(QKeySequence::Undo);
-    connect(undoAct, SIGNAL(triggered()), this, SLOT(undo()));
 
-    redoAct = new QAction(tr("&Redo"), this);
-    redoAct->setShortcuts(QKeySequence::Redo);
-    connect(redoAct, SIGNAL(triggered()), this, SLOT(redo()));
+    // undoAct = new QAction(tr("&Undo"), this);
+    // undoAct->setShortcuts(QKeySequence::Undo);
+    // connect(undoAct, SIGNAL(triggered()), this, SLOT(undo()));
+
+    // redoAct = new QAction(tr("&Redo"), this);
+    // redoAct->setShortcuts(QKeySequence::Redo);
+    // connect(redoAct, SIGNAL(triggered()), this, SLOT(redo()));
+
+    editAct = new QAction(tr("Edit Chunk..."), this);
+    connect(editAct, SIGNAL(triggered()), this, SLOT(cut()));
+
+    deleteAct = new QAction(tr("Delete"), this);
+    connect(deleteAct, SIGNAL(triggered()), this, SLOT(cut()));
+
+    moveUpAct = new QAction(tr("Move Up"), this);
+    connect(moveUpAct, SIGNAL(triggered()), this, SLOT(copy()));
+
+    moveDownAct = new QAction(tr("Move Down"), this);
+    connect(moveDownAct, SIGNAL(triggered()), this, SLOT(paste()));
 
     cutAct = new QAction(tr("Cu&t"), this);
     cutAct->setShortcuts(QKeySequence::Cut);
@@ -232,6 +262,7 @@ void MainWindow::createActions()
     pasteAct = new QAction(tr("&Paste"), this);
     pasteAct->setShortcuts(QKeySequence::Paste);
     connect(pasteAct, SIGNAL(triggered()), this, SLOT(paste()));
+
 /*
     boldAct = new QAction(tr("&Bold"), this);
     boldAct->setCheckable(true);
@@ -258,6 +289,7 @@ void MainWindow::createActions()
     connect(setParagraphSpacingAct, SIGNAL(triggered()),
             this, SLOT(setParagraphSpacing()));
 */
+
     helpContentsAct = new QAction(tr("&Help Contents"), this);
     // helpContentsAct->setShortcut(tr("F1"));
     connect(helpContentsAct, SIGNAL(triggered()), this, SLOT(about()));
@@ -268,6 +300,8 @@ void MainWindow::createActions()
     aboutQtAct = new QAction(tr("About &Qt"), this);
     connect(aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
     connect(aboutQtAct, SIGNAL(triggered()), this, SLOT(aboutQt()));
+
+
 /*
     leftAlignAct = new QAction(tr("&Left Align"), this);
     leftAlignAct->setCheckable(true);
@@ -303,21 +337,23 @@ void MainWindow::createMenus()
     fileMenu = menuBar()->addMenu(tr("&File"));
     fileMenu->addAction(newAct);
     fileMenu->addAction(openAct);
-    // MENUITEM "Reopen\tCtrl+R",             ID_REOPEN
+    fileMenu->addAction(reOpenAct);
     fileMenu->addAction(saveAct);
-    // MENUITEM "Save &As...\tCtrl+Shift+S",   ID_SAVEAS
-    // MENUITEM "&Close",                      ID_CLOSEDOCUMENT
+    fileMenu->addAction(saveAsAct);
+    fileMenu->addAction(closeAct);
     fileMenu->addSeparator();
+    fileMenu->addAction(checkValidAct);
+    fileMenu->addAction(fileSigAct);
     // MENUITEM "Check &Validity\tF5",         ID_CHECKPNG
     // MENUITEM "&File Signature...",          ID_SIGNATURE
     fileMenu->addSeparator();
     fileMenu->addAction(exitAct);
 
     editMenu = menuBar()->addMenu(tr("&Edit"));
-    // MENUITEM "&Edit Chunk...\tEnter",       ID_EDITCHUNK
-    // MENUITEM "&Delete\tDel",                ID_DELCHUNK
-    // MENUITEM "Move &Up\tAlt+Up",            ID_MOVEUP
-    // MENUITEM "Mo&ve Down\tAlt+Down",        ID_MOVEDOWN
+    editMenu->addAction(editAct);
+    editMenu->addAction(deleteAct);
+    editMenu->addAction(moveUpAct);
+    editMenu->addAction(moveDownAct);
     editMenu->addSeparator();
     editMenu->addAction(cutAct);
     editMenu->addAction(copyAct);

@@ -1,7 +1,7 @@
 #include "table.h"
 
 
-TableItem::TableItem()
+ChunkTableItem::ChunkTableItem()
 {
     this->name = "";
     this->len  = "";
@@ -11,8 +11,7 @@ TableItem::TableItem()
 }
 
 
-TableModel::TableModel(QObject *parent) :
-    QAbstractTableModel(parent)
+ChunkTableModel::ChunkTableModel(QObject *parent): QAbstractTableModel(parent)
 {
     // Let's start by assigning names to our columns
     header_data << tr("Chunk");
@@ -22,20 +21,28 @@ TableModel::TableModel(QObject *parent) :
     header_data << tr("Contents");
 
     for(int i = 1; i < 4; i++) {
-        TableItem* it = new TableItem;
+        ChunkTableItem* it = new ChunkTableItem;
         list.append(it);
     }
 }
  
-QVariant TableModel::data(const QModelIndex &index, int role) const
+QVariant ChunkTableModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid())
-        return QVariant();
- 
-    if (index.row() >= list.size())
+    if(!index.isValid())
         return QVariant();
 
-    if (role == Qt::DisplayRole || role == Qt::EditRole){
+    // Alignment of text withing the cells
+    if(role == Qt::TextAlignmentRole) {
+        if(index.column() == 1)
+            return QVariant(Qt::AlignRight | Qt::AlignVCenter);
+
+        return QVariant(Qt::AlignLeft | Qt::AlignVCenter);
+    }
+ 
+    if(index.row() >= list.size())
+        return QVariant();
+
+    if(role == Qt::DisplayRole || role == Qt::EditRole) {
         if (index.column() == 0 )
             return list.at(index.row())->name;
         if (index.column() == 1 )
@@ -51,12 +58,12 @@ QVariant TableModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
  
-bool TableModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool ChunkTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    if (index.isValid() && role == Qt::EditRole) {
+    if(index.isValid() && role == Qt::EditRole) {
         int row = index.row();
 
-        switch (index.column()) {
+        switch(index.column()) {
             case 0:
                 list[row]->name = value.toString();
             break;
@@ -90,38 +97,45 @@ bool TableModel::setData(const QModelIndex &index, const QVariant &value, int ro
     return false;
 }
 
-int TableModel::rowCount(const QModelIndex &parent) const
+int ChunkTableModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
 
     return list.size();
 }
  
-int TableModel::columnCount(const QModelIndex &parent)    const
+int ChunkTableModel::columnCount(const QModelIndex &parent)    const
 {
     Q_UNUSED(parent);
 
     return 5;
 }
 
-QVariant TableModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant ChunkTableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-
-    if(role == Qt::TextAlignmentRole ){
-        return Qt::AlignLeft;
+    // Alignment of text within the headers
+    if(role == Qt::TextAlignmentRole ) {
+        // Row headers
+        if(orientation == Qt::Horizontal) {
+            return (section == 1) ? Qt::AlignRight : Qt::AlignLeft;
+        }
+        // Col headers
+        if(orientation == Qt::Vertical) {
+            return Qt::AlignCenter;
+        }
     }
 
     if(role != Qt::DisplayRole)
         return QVariant();
 
-    if(orientation == Qt::Horizontal && role == Qt::DisplayRole){
+    if(orientation == Qt::Horizontal && role == Qt::DisplayRole) {
         return header_data.at(section);
-    }else{
+    } else {
         return QString("%1").arg( section + 1 );
     }
 }
 
-Qt::ItemFlags TableModel::flags(const QModelIndex &index) const
+Qt::ItemFlags ChunkTableModel::flags(const QModelIndex &index) const
 {
    if (!index.isValid())
         return Qt::ItemIsEnabled;
